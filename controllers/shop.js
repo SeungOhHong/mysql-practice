@@ -4,7 +4,6 @@ const Cart = require("../models/cart");
 exports.getProducts = (req, res, next) => {
   Product.fetchAll()
     .then(([rows, fieldData]) => {
-      // 이제 DB에서 반환된 데이터가 렌더링 된다
       res.render("shop/product-list", {
         prods: rows,
         pageTitle: "All Products",
@@ -16,13 +15,17 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findById(prodId, (product) => {
-    res.render("shop/product-detail", {
-      product: product,
-      pageTitle: product.title,
-      path: "/products",
-    });
-  });
+  Product.findById(prodId)
+    // then / catch 문을 이용해서 처리해준다
+    .then(([product]) => {
+      res.render("shop/product-detail", {
+        // 배열의 첫번째 요소를 불러와준다
+        product: product[0],
+        pageTitle: product.title,
+        path: "/products",
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getIndex = (req, res, next) => {
